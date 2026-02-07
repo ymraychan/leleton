@@ -29,10 +29,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      # --- ADD THIS STEP ---
-      - name: Clean up old workspace
-        run: rm -rf $GITHUB_WORKSPACE/* || true
-      # ---------------------
 
       - name: Checkout
         uses: actions/checkout@v6
