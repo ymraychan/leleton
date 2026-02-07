@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /rickroll.mp4
+Disallow: /404.html
