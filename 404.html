@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <div id="error-container" style="text-align:center; padding:50px; font-family:sans-serif;">
+            <h1>404 - Page Not Found</h1>
+            <p>Oops! The link is broken. Click below to return to safety.</p>
+            <button id="fix-button" style="padding:10px 20px; cursor:pointer;">Return to Home</button>
+        </div>
+
+        <!-- The Rickroll Video (Hidden) -->
+        <video id="rick-video" style="display:none; width:100vw; height:100vh; position:fixed; top:0; left:0; object-fit:cover;" playsinline>
+            <source src="getrickrolled.mp4" type="video/mp4">
+        </video>
+        <!-- The real return button, hidden initially -->
+        <a id="real-home-btn" href="index.html" style="display:none; position:fixed; bottom:10%; left:50%; transform:translateX(-50%); z-index:10000; padding:15px 30px; background:#007bff; color:white; text-decoration:none; border-radius:5px; font-weight:bold;">
+            Click here to actually return to home
+        </a>
+        <script>
+            const fixBtn = document.getElementById('fix-button');
+            const video = document.getElementById('rick-video');
+            const errorMsg = document.getElementById('error-container');
+            const realHomeBtn = document.getElementById('real-home-btn');
+
+            fixBtn.addEventListener('click', function() {
+                // Hide error, show and play video
+                errorMsg.style.display = 'none';
+                video.style.display = 'block';
+                video.play();
+            });
+
+            // This triggers ONLY when the video file finishes playing
+            video.addEventListener('timeupdate', function() {
+                if (video.currentTime >= 10) { // Show after 10 seconds
+                    realHomeBtn.style.display = 'block';
+                }
+            });
+        </script>
+    </body>
+</html>
