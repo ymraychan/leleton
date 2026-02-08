@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Music&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="translator-container" style="display:flex; flex-direction:column; align-items:center; font-family: 'Noto Music', serif;">
+    
+    <!-- TOP ROW: Labels and Button Aligned Centered -->
+    <div style="display:flex; align-items: center; gap: 20px; font-size: 100px;">
+        <span id="lang1">English</span>
+        
+        <!-- The button aligns to the vertical middle of this row -->
+        <button onclick="swapLanguages()" style="height:50px; font-size: 16px; padding: 0 15px;">
+            ⇄ Swap
+        </button>
+        
+        <span id="lang2">Yoylese</span>
+    </div>
+
+    <!-- BOTTOM ROW: Input/Output Boxes -->
+    <div style="display:flex; gap:20px; margin-top: 10px; box-sizing: border-box; padding: 10px; margin: 0;">
+        <textarea id="inputBox" placeholder="Type here..."
+            style="resize:none; width:300px; height:150px; font-size:20pt;"></textarea>
+            
+        <div id="outputBox"
+            style="width:300px; height:150px; border:1px solid #ccc; font-size: 20pt;">
+        </div>
+    </div>
+    <div style="display:flex; gap:20px; margin-top: 10px; box-sizing: border-box; padding: 10px; margin: 0;">
+        <button onclick="doTranslate()">Translate</button>
+    </div>
+</div>
+<script src="scripts.js"></script>
+</body>
+</html>
