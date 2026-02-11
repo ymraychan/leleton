@@ -8,31 +8,42 @@ const decryptMap = {};
 
 function doTranslate() {
     const text = document.getElementById("inputBox").value;
-    const input = Array.from(text.toLowerCase());
     const key = Number(document.getElementById("key").value) || 0;
     const action = getSelectedAction();
 
     let result = "";
 
-    for (let i = 0; i < input.length; i++) {
-        const char = input[i];
-        const index = english.indexOf(char);
+    for (let i = 0; i < text.length; i++) {
+        const originalChar = text[i];
+        const lowerChar = originalChar.toLowerCase();
+        const index = english.indexOf(lowerChar);
 
-        // keep punctuation / spaces unchanged
+        // keep spaces / punctuation unchanged
         if (index === -1) {
-            result += text[i];
+            result += originalChar;
             continue;
         }
 
+        let shiftedIndex;
         if (action === "encrypt") {
-            result += english[(index + key) % 26];
+            shiftedIndex = (index + key) % 26;
         } else {
-            result += english[(index - key + 26) % 26];
+            shiftedIndex = (index - key + 26) % 26;
         }
+
+        let newChar = english[shiftedIndex];
+
+        // restore uppercase if needed
+        if (originalChar === originalChar.toUpperCase()) {
+            newChar = newChar.toUpperCase();
+        }
+
+        result += newChar;
     }
 
     document.getElementById("outputBox").textContent = result;
 }
+
 
 
 function getSelectedAction() {
