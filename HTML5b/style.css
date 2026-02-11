@@ -71,3 +71,53 @@ p{
 	background-color: white;
 	border: 5px solid #000000
 }
+.top-left {
+	position: fixed;
+	top: 10px;
+	left: 10px;
+	z-index: 999;
+	width: 200px;
+	height: 100px;
+	font-size: 30px;
+	color: #000000;
+	background-color: white;
+	border: 5px solid #000000
+}
+
+.top-left-reset {
+	position: fixed;
+	top: 150px;
+	left: 10px;
+	z-index: 999;
+	width: 200px;
+	height: 100px;
+	font-size: 30px;
+	color: #000000;
+	background-color: white;
+	border: 5px solid #000000
+}
+
+.top-right {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  font-family: monospace;
+  font-size: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+
+  /* ADD THESE LINES */
+  width: 140px;           /* Fixed width prevents "shaking" when numbers change */
+  height: 30px;          /* Fixed height */
+  overflow: hidden;      /* Keeps the box rigid */
+  display: block;        /* Ensures it behaves as a container */
+  z-index: 9999;         /* Keeps it above the game canvas */
+  pointer-events: none;  /* Prevents the box from eating mouse clicks */
+  contain: strict;       /* IMPORTANT: Tells browser this box won't affect game layout */
+}
+
+.hidden {
+  display: none;
+}

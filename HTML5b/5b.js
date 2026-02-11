@@ -22,11 +22,21 @@ const cheight = 540;
 let pixelRatio;
 let addedZoom = 1;
 let highQual = true;
-const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+const requestAnimationFrame = window.requestAnimationFrame 
 const browserPasteSolution = typeof navigator.clipboard.readText === "function";
 const browserCopySolution = typeof navigator.clipboard.write === "function";
 let copyButton = 0; // Hack to make copying work on Safari.
 const isMobile = isTouchDevice();
+let speedrunEnabled = false;
+if (localStorage.getItem("speedrunEnabled" != null)) {
+	speedrunEnabled = localStorage.getItem("speedrunEnabled");
+}
+let speedrunStarted = false;
+let startTime = 0;
+let timerInterval = null;
+let elapsed;
+
+
 
 // offscreen canvases
 let osc1, osctx1;
@@ -122,6 +132,76 @@ const difficultyMap = [
 	["Impossible", "#3d0000"],
 ];
 
+window.addEventListener("DOMContentLoaded", () => {
+
+  const toggleBtn = document.getElementById("speedrunToggle");
+  const timerDisplay = document.getElementById("speedrunTimer");
+
+  toggleBtn.addEventListener("click", () => {
+
+    speedrunEnabled = !speedrunEnabled;
+	localStorage.setItem("speedrunEnabled", speedrunEnabled);
+	quirksMode = true
+	frameRateThrottling = false;
+    if (speedrunEnabled) {
+      toggleBtn.textContent = "Disable Speedrun";
+    } else {
+      toggleBtn.textContent = "Enable Speedrun";
+      stopSpeedrunTimer();
+    }
+
+  });
+  
+  window.startSpeedrunTimer = function() {
+
+      if (!speedrunEnabled || speedrunStarted) return;
+		speedrunStarted = true;
+
+		const savedStart = localStorage.getItem('speedrunStartTimestamp');
+		
+		if (savedStart === null) {
+			startTime = Date.now();
+			localStorage.setItem('speedrunStartTimestamp', startTime); // Save it immediately
+		} else {
+			startTime = parseFloat(savedStart);
+		}
+    timerDisplay.classList.remove("hidden");
+
+    function updateTimer() {
+		// If the speedrun is stopped, break the loop
+		if (!speedrunStarted) return; 
+
+		elapsed = Date.now() - startTime;
+
+		const minutes = Math.floor(elapsed / 60000);
+		const seconds = Math.floor((elapsed % 60000) / 1000);
+		const millis = Math.floor(elapsed % 1000);
+
+		timerDisplay.textContent =
+			`${String(minutes).padStart(2, "0")}:` +
+			`${String(seconds).padStart(2, "0")}.` +
+			`${String(millis).padStart(3, "0")}`;
+
+		// Syncs with the browser's refresh rate for maximum stability
+		requestAnimationFrame(updateTimer);
+}
+
+// Start the loop
+requestAnimationFrame(updateTimer);
+
+  };
+
+  window.stopSpeedrunTimer = function() {
+
+    speedrunStarted = false;
+    clearInterval(timerInterval);
+    timerDisplay.classList.add("hidden");
+
+  };
+  window.resetSpeedrun = function() {
+	localStorage.removeItem("speedrunStartTimestamp", "0")
+  }
+});
 function clearVars() {
 	deathCount = timer = coins = bonusProgress = levelProgress = 0;
 	bonusesCleared = new Array(33).fill(false);
@@ -2382,6 +2462,7 @@ function menuNewGame() {
 	if (levelProgress != 0) {
 		showingNewGame2 = true;
 	} else {
+		startSpeedrunTimer()
 		beginNewGame();
 	}
 }
@@ -2392,6 +2473,8 @@ function menuNewGame2no() {
 
 function menuNewGame2yes() {
 	showingNewGame2 = false;
+	startSpeedrunTimer()
+	resetSpeedrun()
 	beginNewGame();
 }
 
@@ -2411,6 +2494,7 @@ function exploreNewGame2yes() {
 
 function menuContGame() {
 	enterBaseLevelpackLevelSelect();
+	startSpeedrunTimer();
 	getSavedGame();
 }
 
@@ -5483,7 +5567,6 @@ function closeToEdgeX() {
 }
 
 function removeLCTiles() {
-	console.log('removeLCTiles');
 	// osctx3.clearRect(0, 0, osc3.width, osc3.height);
 	// let y = 0;
 	// while(y < levelHeight)
@@ -6758,7 +6841,6 @@ function readExploreLevelString(str) {
 function setLCMessage(text) {
 	lcMessageTimer = 1;
 	lcMessageText = text;
-	console.log(text);
 }
 
 function tileCharFromID(id) {
@@ -7012,7 +7094,6 @@ function setExplorePage(page) {
 function setMyLevelsPage(page) {
 	myLevelsPage = page;
 	let keys = Object.keys(myLevelsTab==0?lcSavedLevels:lcSavedLevelpacks);
-	console.log(myLevelsPage);
 	let offset = myLevelsPage*8;
 	myLevelsPageCount = Math.ceil(keys.length / 8.0);
 	if (myLevelsPage > myLevelsPageCount) myLevelsPage = myLevelsPageCount - 1;
@@ -7021,7 +7102,6 @@ function setMyLevelsPage(page) {
 		let key = keys[i + offset];
 		explorePageLevels.push(myLevelsTab===0?lcSavedLevels[key]:lcSavedLevelpacks[key]);
 	}
-	console.log(explorePageLevels);
 	truncateLevelTitles(explorePageLevels, 0);
 	if (myLevelsTab === 0) setExploreThumbs();
 }
@@ -10531,7 +10611,6 @@ function updateFPS() {
     fps = parseInt(inputVal);
     interval = 1000 / fps;
     
-    console.log(`FPS updated to: ${fps}`);
 }
 
 function rAF60fps() {

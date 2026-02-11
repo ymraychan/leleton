@@ -14,18 +14,23 @@
 	<meta name="twitter:card" content="summary_large_image">
 	<link rel="shortcut icon" type="image/x-icon" href="./visuals/blocks/b0001.svg" />
 	<link rel="stylesheet" href="style.css" type="text/css"/>
-	<script type="text/javascript" src="5b.js"></script>
 </head>
 <body style="overflow:hidden;">
 <div id="center">
+	<button id="speedrunToggle" class="top-left">Enable Speedrun</button>
+
+	<div id="speedrunTimer" class="top-right hidden">
+	00:00.000
+	</div>
 	<div id="hide-contenteditable"><canvas width="960" height="540" id="cnv" contenteditable="false"></canvas></div>
 	<p class="bottomtext">An HTML5 port of Cary Huang's <a href="https://bfdi.tv/5b/">BFDIA 5b</a>. Explore is powered by <a href="https://5beam.zelo.dev/">Zelo101's 5beam</a>. <br> Code by <a href="https://github.com/coppersalts/HTML5b" target="_blank">coppersalts</a>. 
 	Modified source and license available <a href="https://github.com/leleton/HTML5b" target="_blank">here</a>.
 	<p class="bottomtext">Please enter FPS (default is 60): 
 	<input id="fpsInput" type="number" min="1" max="240" value="60" step="1">
 	</p>
-	<button class="btn" onclick="updateFPS()">Set FPS</button>
+	<button style="padding:10px 20px; cursor:pointer;" onclick="updateFPS()">Set FPS</button>
 </p></p>
 </div>
+<script type="text/javascript" src="5b.js"></script>
 </body>
 </html>

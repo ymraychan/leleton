@@ -43,3 +43,17 @@ function adjustFontSize(el) {
         el.style.fontSize = size + "px";
     }
 }
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    console.log('Text successfully copied!');
+  } catch (err) {
+    console.error('Failed to copy: ', err);
+  }
+}
+document.getElementById("copyTranslated").addEventListener("click", function () {
+  copyToClipboard(document.getElementById("outputBox").textContent)
+});
+document.getElementById("copyOriginal").addEventListener("click", function () {
+  copyToClipboard(document.getElementById("inputBox").value)
+});
