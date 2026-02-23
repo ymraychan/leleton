@@ -22,12 +22,12 @@
             const errorMsg = document.getElementById('error-container');
             const realHomeBtn = document.getElementById('real-home-btn');
 
-            fixBtn.addEventListener('click', function() {
+            fixBtn.addEventListener('click', setTimeout(function() {
                 // Hide error, show and play video
                 errorMsg.style.display = 'none';
                 video.style.display = 'block';
                 video.play();
-            });
+            }), 2000);
 
             // This triggers ONLY when the video file finishes playing
             video.addEventListener('timeupdate', function() {

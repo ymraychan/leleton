@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Google Docs</title>
+        <link rel="icon" type="image/x-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAMAAACfWMssAAAAWlBMVEUAhvn////E2f0Af/kAZ9kAgfl+s/vd7v7O5P2Ov/z8//8Qi/kfjvkAcuQAYdgAhPkAevnv9/80ed6Twvy10/1Hmvp9t/vj8v5zsvtPoPo8l/pIjusAbeP4+/4eErpqAAAA3UlEQVRIie3XyxKCIBSA4YNKhZmoeK/e/zVzgyN4lAMzVgv/lQu/QYFxEJiuHgFNPhkW6AtR4A7gVaU7sNx08MgxqWEUb8MkrwJhgoxJg4gkwrWkwpUkQ1vSoSU9oLkqPtAY0wsux/SDk3zToVEcnTAASo4mXVA2F7RGOiBXDE1xFxQ4FE7YdlekrnVB4DEa/8N1DH1U3t/Q+uOWI3QDyEEJJDW4tlzwJv/BOt4zKyJcz2pGhIKlRmQYOuL0klaHz+oJT/gduHO0NipKC+4c5g03f3ZnuPn7sGys59s/3MMTXEbdIzMAAAAASUVORK5CYII=">
+    </head>
+    <body>
+        <style>
+            body { margin: 0; padding: 0; overflow: hidden; background: #000; }
+            iframe { width: 100vw; height: 100vh; border: none; }
+        </style>
+        <!-- Added id="gameFrame" and onload handler -->
+        <iframe id="gameFrame" src="https://byebyeshane.netlify.app/eagler-files/1.8/astraclient" onload="this.focus()"></iframe>
+        <script>
+            // This ensures that clicking anywhere in the window focuses the iframe
+            window.addEventListener('click', () => {
+                document.getElementById('gameFrame').focus();
+            });
+        </script>
+    </body>
+</html>
