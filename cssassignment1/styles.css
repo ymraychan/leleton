@@ -1,0 +1,8 @@
+html {font-size: 24px; }
+body {background-image: url('rickroll.gif'); cursor: url('rickroll.gif'), auto;}
+td, th {padding: 50px; vertical-align: middle; text-align: center;}
+td:hover {background-color: #ffff00;}
+.square {color: #ff00ff; font-weight: bolder}
+div {width: 300px; border-color: #00ff00; border-width: 15px; padding: 50px; margin: 20px; border-style: solid; border-radius: 50px}
+div:hover {background-color: blue}
+table {user-select: none;}

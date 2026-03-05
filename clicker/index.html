@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script defer src="script.js"></script>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div id="save-toast" style="
+            display: none; 
+            position: fixed; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: #333; 
+            color: #fff; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            z-index: 1000;">
+            Saved!
+        </div>
+
+        <h1>Points: <span id='score'> 0 </span></h1>
+        <button class="clicker" onclick="increaseScore()">Click me</button>
+        <br> <br>
+        <button class="save" onclick="save()">Save</button>
+        <button class="clear" onclick="clearData()">Clear all data</button>
+        <div id="shop" style="margin-top: 20px; border-top: 2px solid #333; padding-top: 20px;">
+            <h2>Shop</h2>
+            <button id="upgradeMouse" onclick="handleUpgrades('mouse')" style="padding: 10px 20px; font-size: 20px;">
+                Better Mouse (Cost: <span id='mousecost'>15</span>)
+            </button>
+            <button id="upgradeAuto" onclick="handleUpgrades('autoclicker')" style="padding: 10px 20px; font-size: 20px;">
+                Autoclicker (Cost: <span id='autoclickercost'>100</span>) <!--Multiplier: 1.15-->
+            </button>
+        </div>
+    </body>
+</html>

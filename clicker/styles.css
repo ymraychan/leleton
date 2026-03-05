@@ -1,0 +1,27 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.clicker {
+    width: 200px; height: 200px; cursor: pointer; border-radius: 50%; font-size: 40px
+}
+.clicker:hover {
+    background-color: yellow;
+}
+.clear {
+    width: 200px; height: 50px; font-size: 20pt
+}
+.clear:hover {
+    background-color: red;
+}
+.save {
+    width: 200px; height: 100px; font-size: 50pt
+}
+.save:hover {
+    background-color: skyblue;
+}
