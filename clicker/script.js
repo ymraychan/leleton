@@ -1,110 +1,146 @@
-// Load data from localStorage or use defaults
-let score = parseInt(localStorage.getItem('score')) || 0;
+// 1. DATA INITIALIZATION
+let score = parseInt(localStorage.getItem('score')) || 999999999;
 let scorePerClick = parseInt(localStorage.getItem('scorePerClick')) || 1;
 let numAutoClickers = parseInt(localStorage.getItem('numautoclickers')) || 0;
+let numDVDs = parseInt(localStorage.getItem('numdvds')) || 0;
 
-// Load the costs object or use default if it doesn't exist
 let savedCosts = localStorage.getItem('costs');
-let costs = savedCosts ? JSON.parse(savedCosts) : { mouse: 15 , autoclicker: 100};
-document.getElementById('mousecost').innerText = costs['mouse'];
+let costs = savedCosts ? JSON.parse(savedCosts) : { mouse: 15, autoclicker: 100, dvd: 1000 };
 
-// Initial UI Update to show loaded data
-document.getElementById('score').innerText = score;
-document.getElementById('mousecost').innerText = costs.mouse;
-document.getElementById('autoclickercost').innerText = costs.autoclicker;
+const activeDVDs = [];
 
+// 2. DVD CLASS LOGIC
+class BouncingDVD {
+    constructor() {
+        this.element = document.createElement('img');
+        // FIXED IMAGE URL (The one you had was broken)
+        this.element.src = "./xkcd1.png";
+        this.element.style.cssText = `
+            position: fixed; 
+            width: 100px; 
+            z-index: 100000000; 
+            pointer-events: none; 
+            filter: invert(1);
+            opacity: 1;               /* 1 is solid, 0 is invisible */
+        `;
+        document.body.appendChild(this.element);
+
+        this.width = 100;
+        this.height = 45;
+        this.x = Math.random() * (window.innerWidth - this.width);
+        this.y = Math.random() * (window.innerHeight - this.height);
+        this.xs = 3;
+        this.ys = 3;
+    }
+
+    update() {
+        if (this.x + this.width >= window.innerWidth || this.x <= 0) {
+            this.xs *= -1;
+            this.onBounce();
+        }
+        if (this.y + this.height >= window.innerHeight || this.y <= 0) {
+            this.ys *= -1;
+            this.onBounce();
+        }
+        this.x += this.xs;
+        this.y += this.ys;
+        this.element.style.left = this.x + 'px';
+        this.element.style.top = this.y + 'px';
+    }
+
+    onBounce() {
+        score += 5; 
+        updateUI();
+        this.element.style.filter = `invert(1) sepia(1) saturate(5) hue-rotate(${Math.random() * 360}deg)`;
+    }
+}
+
+// 3. UI UPDATER (MATCHES YOUR HTML IDs)
+function updateUI() {
+    document.getElementById('score').innerText = Math.floor(score);
+    document.getElementById('mousecost').innerText = costs.mouse;
+    document.getElementById('autoclickercost').innerText = costs.autoclicker;
+    
+    // Safety check: makes sure the DVD cost display exists
+    const dvdDisplay = document.getElementById('dvdcost');
+    if (dvdDisplay) dvdDisplay.innerText = costs.dvd;
+}
+
+// 4. GAME FUNCTIONS
 function increaseScore() {
     score += scorePerClick;
-    document.getElementById('score').innerText = score;
-}
-
-
-function showSaveNotification() {
-    const toast = document.getElementById('save-toast');
-    toast.style.display = 'block';
-    setTimeout(() => { toast.style.display = 'none'; }, 2000);
-}
-
-function save() {
-    // Save all three pieces of data
-    localStorage.setItem('score', score.toString());
-    localStorage.setItem('scorePerClick', scorePerClick.toString());
-    localStorage.setItem('costs', JSON.stringify(costs)); // Save the whole object
-    localStorage.setItem('numautoclickers', numAutoClickers);
-    
-    showSaveNotification();
-}
-
-setInterval(save, 30000);
-
-function buyUpgrade(type) {
-    let cost = costs[type];
-    if (type == 'mouse') {
-        if (score >= cost) {
-            score -= cost;
-            costs[type] = Math.ceil(costs[type] * 1.5); 
-            scorePerClick++;
-
-            // Update UI
-            document.getElementById('score').innerText = score;
-            document.getElementById(type + 'cost').innerText = costs[type];
-            
-            // Optional: Save immediately on purchase
-            save();
-        } 
-        else {
-            alert('Not enough points! You need ' + cost);
-        }
-    }
-    else if (type == 'autoclicker') {
-        if (score >= cost) {
-            score -= cost;
-            costs[type] = Math.ceil(costs[type] * 1.15); 
-
-            // Update UI
-            document.getElementById('score').innerText = score;
-            document.getElementById(type + 'cost').innerText = costs[type];
-            
-            // Optional: Save immediately on purchase
-            numAutoClickers++;
-            save();
-        } 
-        else {
-            alert('Not enough points! You need ' + cost);
-        }
-    }
-    
+    updateUI();
 }
 
 function handleUpgrades(type) {
-    buyUpgrade(type);
+    // 1. Force the cost to 1000 if the object property is missing
+    let cost = costs[type];
+    
+    if (score >= cost) {
+        score -= cost;
+        
+        if (type === 'mouse') {
+            scorePerClick++;
+            costs.mouse = Math.ceil(costs.mouse * 1.5);
+        } 
+        else if (type === 'autoclicker') {
+            numAutoClickers++;
+            costs.autoclicker = Math.ceil(costs.autoclicker * 1.15);
+        } 
+        else if (type === 'dvd') {
+            numDVDs++;
+            // Only spawn if the class exists
+            if (typeof BouncingDVD !== 'undefined') {
+                activeDVDs.push(new BouncingDVD());
+            }
+            costs.dvd = Math.ceil(costs.dvd * 1.3);
+        }
+
+        updateUI();
+        save();
+    } else {
+        // 2. This alert will now show the actual cost instead of undefined
+        alert('Need more points! Cost: ' + (cost || "Error: " + type + " not found"));
+    }
+}
+// 5. SYSTEM FUNCTIONS
+function save() {
+    localStorage.setItem('score', score);
+    localStorage.setItem('scorePerClick', scorePerClick);
+    localStorage.setItem('numautoclickers', numAutoClickers);
+    localStorage.setItem('numdvds', numDVDs);
+    localStorage.setItem('costs', JSON.stringify(costs));
+    
+    const toast = document.getElementById('save-toast');
+    if(toast) {
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2000);
+    }
 }
 
 function clearData() {
-    if (confirm("Are you sure you want to clear all data?")) {
+    if (confirm("Reset everything?")) {
         localStorage.clear();
-        
-        // Reset local variables to defaults
-        score = 0;
-        scorePerClick = 1;
-        costs = { mouse: 15, autoclicker: 100};
-
-        // Update UI
-        document.getElementById('score').innerText = 0;
-        document.getElementById('mousecost').innerText = 15;
-        document.getElementById('autoclickercost').innerText = 100;
+        location.reload();
     }
 }
 
-let autoclickTimer;
+// 6. INITIALIZE & ENGINE
+function animate() {
+    activeDVDs.forEach(dvd => dvd.update());
+    requestAnimationFrame(animate);
+}
 
-// 2. This function handles the logic
-function startAutoClicker() {
+// Startup
+for(let i=0; i < numDVDs; i++) { activeDVDs.push(new BouncingDVD()); }
+
+setInterval(() => {
     if (numAutoClickers > 0) {
         score += numAutoClickers;
-        document.getElementById('score').innerText = score;
+        updateUI();
     }
-}
+}, 1000);
 
-// 3. Start the interval ONCE when the script loads
-autoclickTimer = setInterval(startAutoClicker, 1000);
+setInterval(save, 30000);
+updateUI();
+animate();

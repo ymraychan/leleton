@@ -19,18 +19,21 @@
             Saved!
         </div>
 
-        <h1>Points: <span id='score'> 0 </span></h1>
-        <button class="clicker" onclick="increaseScore()">Click me</button>
+        <h1>Points: <span id='score'> 999999999 </span></h1>
+        <button class="clicker" onclick="increaseScore()"></button>
         <br> <br>
         <button class="save" onclick="save()">Save</button>
         <button class="clear" onclick="clearData()">Clear all data</button>
         <div id="shop" style="margin-top: 20px; border-top: 2px solid #333; padding-top: 20px;">
             <h2>Shop</h2>
-            <button id="upgradeMouse" onclick="handleUpgrades('mouse')" style="padding: 10px 20px; font-size: 20px;">
+            <button id="upgradeMouse" onclick="handleUpgrades('mouse')" class="shop">
                 Better Mouse (Cost: <span id='mousecost'>15</span>)
             </button>
-            <button id="upgradeAuto" onclick="handleUpgrades('autoclicker')" style="padding: 10px 20px; font-size: 20px;">
+            <button id="upgradeAuto" onclick="handleUpgrades('autoclicker')" class="shop">
                 Autoclicker (Cost: <span id='autoclickercost'>100</span>) <!--Multiplier: 1.15-->
+            </button>
+            <button id="spawndvd" onclick="handleUpgrades('dvd')" class="shop">
+                New What If? (Cost: <span id="dvdcost">1000</span>)
             </button>
         </div>
     </body>

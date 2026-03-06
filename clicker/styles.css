@@ -8,7 +8,16 @@ body {
 }
 
 .clicker {
-    width: 200px; height: 200px; cursor: pointer; border-radius: 50%; font-size: 40px
+    width: 598px; 
+    height: 800px; 
+    cursor: pointer; 
+    border-width: 5px;
+    border-radius: 25%;
+    background-image: url('../clicker/self-portrait-2.webp');
+    background-size: cover; 
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 .clicker:hover {
     background-color: yellow;
@@ -24,4 +33,7 @@ body {
 }
 .save:hover {
     background-color: skyblue;
+}
+.shop {
+    padding: 10px 20px; font-size: 20px;
 }
