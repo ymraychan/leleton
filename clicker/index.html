@@ -18,8 +18,10 @@
             z-index: 1000;">
             Saved!
         </div>
-
-        <h1>Points: <span id='score'> 999999999 </span></h1>
+        <div class="settings">
+        <img id="settings" onclick="openSettings()" src="settings.jpg" style="position: absolute; top: 0; right: 0; scale: 0.15; transform-origin: top right; cursor: pointer">
+        </div>
+        <h1>Points: <span id='score'> 0 </span></h1>
         <button class="clicker" onclick="increaseScore()"></button>
         <br> <br>
         <button class="save" onclick="save()">Save</button>
@@ -27,14 +29,26 @@
         <div id="shop" style="margin-top: 20px; border-top: 2px solid #333; padding-top: 20px;">
             <h2>Shop</h2>
             <button id="upgradeMouse" onclick="handleUpgrades('mouse')" class="shop">
-                Better Mouse (Cost: <span id='mousecost'>15</span>)
+                Better Formula (Cost: <span id='mousecost'>15</span>)
             </button>
             <button id="upgradeAuto" onclick="handleUpgrades('autoclicker')" class="shop">
-                Autoclicker (Cost: <span id='autoclickercost'>100</span>) <!--Multiplier: 1.15-->
+                New Comic (Cost: <span id='autoclickercost'>100</span>) <!--Multiplier: 1.15-->
             </button>
             <button id="spawndvd" onclick="handleUpgrades('dvd')" class="shop">
                 New What If? (Cost: <span id="dvdcost">1000</span>)
             </button>
+            <button id="Book" onclick="handleUpgrades('book')" class="shop">
+                New Book (Cost: <span id="dvdcost">12000</span>)
+            </button>
         </div>
+        <div id="xkcd-container">
+            <iframe id="xkcd-iframe" src="" scrolling="no"></iframe>
+            <!--<iframe 
+    id="xkcd-iframe" 
+    src="https://xkcd.com/#comic" 
+    scrolling="no">
+  </iframe>-->
+        </div>
+        Images by <a href="https://xkcd.com" target="_blank">xkcd.com</a>
     </body>
 </html>

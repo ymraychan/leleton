@@ -8,14 +8,14 @@ body {
 }
 
 .clicker {
-    width: 598px; 
-    height: 800px; 
+    width: 200px; 
+    height: 210px; 
     cursor: pointer; 
     border-width: 5px;
     border-radius: 25%;
-    background-image: url('../clicker/self-portrait-2.webp');
-    background-size: cover; 
-    background-attachment: fixed;
+    background-image: url('xkcd1.png');
+    background-size: fixed; 
+    background-attachment: center;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -23,7 +23,7 @@ body {
     background-color: yellow;
 }
 .clear {
-    width: 200px; height: 50px; font-size: 20pt
+    width: 200px; height: 50px; font-size: 20pt 
 }
 .clear:hover {
     background-color: red;
@@ -37,3 +37,24 @@ body {
 .shop {
     padding: 10px 20px; font-size: 20px;
 }
+
+#xkcd-frame-container {
+  position: fixed;   /* Stays in place when scrolling */
+  top: 10px;         /* Vertical "indent" */
+  left: 10px;        /* Horizontal "indent" */
+  width: 500px;      /* Width of the visible area */
+  height: 450px;     /* Height of the visible area */
+  overflow: hidden;  /* Clips the rest of the xkcd website */
+  border: 2px solid #333;
+  z-index: 9999;
+}
+
+#xkcd-iframe {
+  width: 1000px;     /* Large width to accommodate the original page */
+  height: 1200px;    /* Large height to accommodate the original page */
+  margin-top: -150px; /* Adjust this to "scroll" the comic into view */
+  margin-left: -200px;/* Adjust this to center the comic in your window */
+  border: none;
+}
+
+

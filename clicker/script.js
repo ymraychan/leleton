@@ -1,69 +1,46 @@
-// 1. DATA INITIALIZATION
-let score = parseInt(localStorage.getItem('score')) || 999999999;
-let scorePerClick = parseInt(localStorage.getItem('scorePerClick')) || 1;
-let numAutoClickers = parseInt(localStorage.getItem('numautoclickers')) || 0;
-let numDVDs = parseInt(localStorage.getItem('numdvds')) || 0;
+// 1. SAFE DATA INITIALIZATION
+function getBigInt(key, fallback) {
+    const val = localStorage.getItem(key);
+    // Parse as float first to avoid crashing on old decimal saves
+    return (val && val !== "undefined") ? BigInt(Math.floor(parseFloat(val))) : BigInt(fallback);
+}
 
+let score = getBigInt('score', 0);
+let scorePerClick = getBigInt('scorePerClick', 1);
+let numAutoClickers = getBigInt('numautoclickers', 0);
+let numDVDs = getBigInt('numdvds', 0);
+
+// Load costs with a default for 'book'
 let savedCosts = localStorage.getItem('costs');
-let costs = savedCosts ? JSON.parse(savedCosts) : { mouse: 15, autoclicker: 100, dvd: 1000 };
+let costs = { mouse: 15n, autoclicker: 100n, dvd: 1000n, book: 12000n };
+
+if (savedCosts) {
+    try {
+        let parsed = JSON.parse(savedCosts);
+        for (let key in parsed) {
+            costs[key] = BigInt(Math.floor(parseFloat(parsed[key])));
+        }
+    } catch(e) { console.error("Data Load Error", e); }
+}
 
 const activeDVDs = [];
 
-// 2. DVD CLASS LOGIC
-class BouncingDVD {
-    constructor() {
-        this.element = document.createElement('img');
-        // FIXED IMAGE URL (The one you had was broken)
-        this.element.src = "./xkcd1.png";
-        this.element.style.cssText = `
-            position: fixed; 
-            width: 100px; 
-            z-index: 100000000; 
-            pointer-events: none; 
-            filter: invert(1);
-            opacity: 1;               /* 1 is solid, 0 is invisible */
-        `;
-        document.body.appendChild(this.element);
-
-        this.width = 100;
-        this.height = 45;
-        this.x = Math.random() * (window.innerWidth - this.width);
-        this.y = Math.random() * (window.innerHeight - this.height);
-        this.xs = 3;
-        this.ys = 3;
-    }
-
-    update() {
-        if (this.x + this.width >= window.innerWidth || this.x <= 0) {
-            this.xs *= -1;
-            this.onBounce();
-        }
-        if (this.y + this.height >= window.innerHeight || this.y <= 0) {
-            this.ys *= -1;
-            this.onBounce();
-        }
-        this.x += this.xs;
-        this.y += this.ys;
-        this.element.style.left = this.x + 'px';
-        this.element.style.top = this.y + 'px';
-    }
-
-    onBounce() {
-        score += 5; 
-        updateUI();
-        this.element.style.filter = `invert(1) sepia(1) saturate(5) hue-rotate(${Math.random() * 360}deg)`;
-    }
-}
-
-// 3. UI UPDATER (MATCHES YOUR HTML IDs)
+// 3. UI UPDATER (With Safety Checks)
 function updateUI() {
-    document.getElementById('score').innerText = Math.floor(score);
-    document.getElementById('mousecost').innerText = costs.mouse;
-    document.getElementById('autoclickercost').innerText = costs.autoclicker;
-    
-    // Safety check: makes sure the DVD cost display exists
-    const dvdDisplay = document.getElementById('dvdcost');
-    if (dvdDisplay) dvdDisplay.innerText = costs.dvd;
+    const scoreSpan = document.getElementById('score');
+    if (scoreSpan) {
+        // Use toString() if toLocaleString() is acting up
+        scoreSpan.innerText = score.toLocaleString();
+    }
+
+    // Update shop costs automatically
+    const ids = ['mouse', 'autoclicker', 'dvd', 'book'];
+    ids.forEach(id => {
+        const el = document.getElementById(id + 'cost');
+        if (el && costs[id]) {
+            el.innerText = costs[id].toLocaleString();
+        }
+    });
 }
 
 // 4. GAME FUNCTIONS
@@ -73,44 +50,43 @@ function increaseScore() {
 }
 
 function handleUpgrades(type) {
-    // 1. Force the cost to 1000 if the object property is missing
     let cost = costs[type];
-    
     if (score >= cost) {
         score -= cost;
-        
         if (type === 'mouse') {
-            scorePerClick++;
-            costs.mouse = Math.ceil(costs.mouse * 1.5);
+            scorePerClick += 1n;
+            costs.mouse = (costs.mouse * 15n) / 10n;
         } 
         else if (type === 'autoclicker') {
-            numAutoClickers++;
-            costs.autoclicker = Math.ceil(costs.autoclicker * 1.15);
+            numAutoClickers += 1n;
+            costs.autoclicker = (costs.autoclicker * 115n) / 100n;
+            window.open("https://c.xkcd.com");
         } 
         else if (type === 'dvd') {
-            numDVDs++;
-            // Only spawn if the class exists
-            if (typeof BouncingDVD !== 'undefined') {
-                activeDVDs.push(new BouncingDVD());
-            }
-            costs.dvd = Math.ceil(costs.dvd * 1.3);
+            numDVDs += 1n; // Add bouncing DVD logic here if you still use the class
+            costs.dvd = (costs.dvd * 13n) / 10n;
         }
-
+        else if (type === 'book') {
+            scorePerClick += 50n;
+            costs.book = costs.book * 2n;
+        }
         updateUI();
         save();
     } else {
-        // 2. This alert will now show the actual cost instead of undefined
-        alert('Need more points! Cost: ' + (cost || "Error: " + type + " not found"));
+        alert('Need more points! Cost: ' + cost.toLocaleString());
     }
 }
+
 // 5. SYSTEM FUNCTIONS
 function save() {
-    localStorage.setItem('score', score);
-    localStorage.setItem('scorePerClick', scorePerClick);
-    localStorage.setItem('numautoclickers', numAutoClickers);
-    localStorage.setItem('numdvds', numDVDs);
-    localStorage.setItem('costs', JSON.stringify(costs));
+    localStorage.setItem('score', score.toString());
+    localStorage.setItem('scorePerClick', scorePerClick.toString());
+    localStorage.setItem('numautoclickers', numAutoClickers.toString());
     
+    let costSave = {};
+    for (let key in costs) costSave[key] = costs[key].toString();
+    localStorage.setItem('costs', JSON.stringify(costSave));
+
     const toast = document.getElementById('save-toast');
     if(toast) {
         toast.style.display = 'block';
@@ -125,22 +101,25 @@ function clearData() {
     }
 }
 
-// 6. INITIALIZE & ENGINE
-function animate() {
-    activeDVDs.forEach(dvd => dvd.update());
-    requestAnimationFrame(animate);
+function openSettings() {
+    let pass = prompt("Enter the password");
+    if (pass == "123") {
+        let val = prompt("Enter amount of points");
+        if (val) {
+            score = BigInt(val.replace(/\D/g, ''));
+            updateUI();
+            save();
+        }
+    }
 }
 
-// Startup
-for(let i=0; i < numDVDs; i++) { activeDVDs.push(new BouncingDVD()); }
-
+// 6. ENGINE START
 setInterval(() => {
-    if (numAutoClickers > 0) {
+    if (numAutoClickers > 0n) {
         score += numAutoClickers;
         updateUI();
     }
 }, 1000);
 
-setInterval(save, 30000);
+// Initialize the screen on load
 updateUI();
-animate();
