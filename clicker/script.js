@@ -60,7 +60,6 @@ function handleUpgrades(type) {
         else if (type === 'autoclicker') {
             numAutoClickers += 1n;
             costs.autoclicker = (costs.autoclicker * 115n) / 100n;
-            window.open("https://c.xkcd.com");
         } 
         else if (type === 'dvd') {
             numDVDs += 1n; // Add bouncing DVD logic here if you still use the class
@@ -123,3 +122,28 @@ setInterval(() => {
 
 // Initialize the screen on load
 updateUI();
+
+  /* const links = [
+    "https://imgs.xkcd.com/comics/heartbleed.png",
+    "https://imgs.xkcd.com/comics/2045.png",
+    "https://imgs.xkcd.com/comics/unreliable_connection.png",
+    "https://imgs.xkcd.com/comics/orbital_argument.png",
+    "https://imgs.xkcd.com/comics/physics_paths.png",
+    "https://imgs.xkcd.com/comics/oily_house_index.png",
+    "https://imgs.xkcd.com/comics/comet_visitor.png",
+    "https://imgs.xkcd.com/comics/strengths_and_weaknesses.png",
+    "https://imgs.xkcd.com/comics/clark_gable.jpg",
+    "https://imgs.xkcd.com/comics/subliminal.png",
+  ];
+
+  // 2. Function to choose and display one
+  function displayRandomLink() {
+    // Generate a random index between 0 and the length of the array
+    const randomIndex = Math.floor(Math.random() * links.length);
+    
+    // Get the iframe and change its source
+    const iframe = document.getElementById("xkcd-iframe");
+    iframe.style.display = "block";
+    iframe.src = links[randomIndex];
+  }
+    */

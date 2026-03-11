@@ -1,0 +1,35 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suprises!</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2026.3.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2026.3.1/core.js"></script>
+    <style>
+        #check {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px 25px;
+            cursor: pointer;
+        }
+        #check:hover { background: #444; }
+        #check:disabled { opacity: 0.3; cursor: not-allowed; }
+        #status { margin-top: 25px; height: 1.5em; font-weight: bold; }
+        .err { color: #ff5555; }
+        .ok { color: #55ff55; }
+    </style>
+</head>
+<body>
+    <div class="box" style="display: flex; justify-content: center; align-items: center; flex-direction: column">
+    <h1>Riddles for solving</h1>
+    <h2>More riddles will be added annually</h2>
+    <h3>Access the code <a href="./logic.txt" target="_blank">here</a></h3>
+        <p id="question">What is the least positive integer, that when read both forwards and backwards, are both a prime?</p> <br>
+        <input type="text" id="answer" spellcheck="false" autocomplete="off"> <br>
+        <button id="check">Verify</button>
+        <p id="status"></p>
+    </div>
+    <script type="py" src="./logic.txt"></script>
+</body>
+</html>

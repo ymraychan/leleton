@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script defer src="script.js"></script>
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
@@ -23,7 +22,6 @@
         </div>
         <h1>Points: <span id='score'> 0 </span></h1>
         <button class="clicker" onclick="increaseScore()"></button>
-        <br> <br>
         <button class="save" onclick="save()">Save</button>
         <button class="clear" onclick="clearData()">Clear all data</button>
         <div id="shop" style="margin-top: 20px; border-top: 2px solid #333; padding-top: 20px;">
@@ -37,18 +35,9 @@
             <button id="spawndvd" onclick="handleUpgrades('dvd')" class="shop">
                 New What If? (Cost: <span id="dvdcost">1000</span>)
             </button>
-            <button id="Book" onclick="handleUpgrades('book')" class="shop">
-                New Book (Cost: <span id="dvdcost">12000</span>)
-            </button>
-        </div>
-        <div id="xkcd-container">
-            <iframe id="xkcd-iframe" src="" scrolling="no"></iframe>
-            <!--<iframe 
-    id="xkcd-iframe" 
-    src="https://xkcd.com/#comic" 
-    scrolling="no">
-  </iframe>-->
+            <button id="Book" onclick="handleUpgrades('book')" class="shop">New Book (Cost: <span id="bookcost">12000</span>)</button>
         </div>
         Images by <a href="https://xkcd.com" target="_blank">xkcd.com</a>
+        <script defer src="script.js"></script>
     </body>
 </html>

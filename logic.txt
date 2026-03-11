@@ -1,0 +1,34 @@
+_0xb,__0xh,__0xd,_0xdt=__import__('base64'),__import__('hashlib'),__import__('pyscript').document,__import__('datetime')
+_0xq=["Svyy va gur oynax: n oynpx ubyr vf n cresrpg ?????????","Gehr be Snyfr: na rirag ubevmba pna pbzcyrgyl qvfnccrne"]
+_0xi=0
+_0xf=False
+def _0x1(t,s=13):
+ _r=""
+ for c in t:
+  if c.isalpha():
+   st=ord('a') if c.islower() else ord('A')
+   _r+=chr((ord(c)-st+s)%26+st)
+  else:_r+=c
+ return _r
+def _0x2(e):
+ global _0xi,_0xq,_0xf
+ _v=__0xd.getElementById("answer").value.strip()
+ if not _0xf:
+  try:
+   _0xq=[_0x1(q,int(_v)) for q in _0xq];_0xf=True;__0xd.getElementById("question").textContent=_0xq[_0xi];__0xd.getElementById("status").innerText="";__0xd.getElementById("answer").value=""
+  except:__0xd.getElementById("status").innerText="NOT AN INTEGER";__0xd.getElementById("status").className="err"
+  return
+ _cv=_v.lower()
+ _s=__0xd.getElementById("status")
+ if _0xi==0:
+  if __0xh.sha256(_cv.encode()).hexdigest()=="5cfaf88089c9b648d8b1913c649785fade74663d5c3c55c0b8c7295f94061ce6":_0xi+=1;_s.innerText="Correct";_s.className="ok"
+  else:_s.innerText="Incorrect";_s.className="err";return
+ elif _0xi==1:
+  if __0xh.sha256(_cv.encode()).hexdigest()=="b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b":_0xi+=1;_s.innerText="Correct";_s.className="ok"
+  else:_s.innerText="Incorrect";_s.className="err";return
+ if _0xi>=len(_0xq):
+  _0m="YOU WON!"
+  if _0xb.b64encode(str(_0xdt.date.today().day).encode())==b"Mjk=" and _0xb.b64encode(str(_0xdt.date.today().month).encode())==b"Mw==":_0m="Happy Birthday, Dad!"
+  _s.innerText=_0m;_s.className="ok";__0xd.getElementById("check").disabled=True
+ else:__0xd.getElementById("question").textContent=_0xq[_0xi];__0xd.getElementById("answer").value=""
+__0xd.getElementById("check").onclick=_0x2
