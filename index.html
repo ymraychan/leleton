@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>leleton</title>
   <link rel="stylesheet" href="/styles.css"/>
+  <!-- 1. The Link (Hidden by default in CSS) -->
+
+
+
 </head>
 <body>
   <header>
@@ -23,9 +27,21 @@
     <a href="magic8ball.html">Magic 8 Ball</a> <br>
     <a href="tutorial.mp4">How to rickroll someone (video)</a> <br>
     <a href="clicker/index.html">Clicker Game (INDEV)</a>
+    <a href="puzzle/index.html" id="launch-link" style="display: none;">Puzzle (updates every year)</a>
   </div>
   <footer>
     <p>&copy; leleton.com | All rights reserved.</p>
   </footer>
+  <script>
+  // 2. Define the launch date: Year, Month (0=Jan, 2=March), Day
+  // This targets March 29, 2026, at 00:00:00 (Midnight)
+  const launchDate = new Date(2026, 2, 29); 
+
+  // 3. Compare with "Right Now"
+  if (new Date() >= launchDate) {
+    // Show the link permanently
+    document.getElementById('launch-link').style.display = 'inline-block';
+  }
+</script>
 </body>
 </html>
