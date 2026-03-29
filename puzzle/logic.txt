@@ -1,5 +1,5 @@
 _0xb,__0xh,__0xd,_0xdt=__import__('bas'+'e64'),__import__('has'+'hl'+'ib'),__import__('pys'+'cript').document,__import__('da'+'teti'+'me')
-_0xq=["Svyy va gur oynax: n oynpx ubyr vf n cresrpg ?????????","Gehr be Snyfr: na rirag ubevmba pna pbzcyrgyl qvfnccrne"]
+_0xq=["Svyy va gur oynax: n oynpx ubyr vf n cresrpg ?????????","Gehr be Snyfr: na rirag ubevmba pna pbzcyrgryl qvfnccrne"]
 _0xi=0
 _0xf=False
 def _0x1(t,s=13):
@@ -21,7 +21,7 @@ def _0x2(e):
  _cv=_v.lower()
  _s=__0xd.getElementById("status")
  if _0xi==0:
-  if __0xh.sha256(_cv.encode()).hexdigest()==" ":_0xi+=1;_s.innerText="Correct";_s.className="ok"
+  if __0xh.sha256(_cv.encode()).hexdigest()=="5cfaf88089c9b648d8b1913c649785fade74663d5c3c55c0b8c7295f94061ce6":_0xi+=1;_s.innerText="Correct";_s.className="ok"
   else:_s.innerText="Incorrect";_s.className="err";return
  elif _0xi==1:
   if __0xh.sha256(_cv.encode()).hexdigest()=="b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b":_0xi+=1;_s.innerText="Correct";_s.className="ok"

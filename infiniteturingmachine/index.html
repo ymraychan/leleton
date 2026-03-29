@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sovereign Ant: True Logic Edition</title>
+    <style>
+        :root {
+            --bg: #050505; --cell-bg: #0a0a0a; --text: #0f0; --border: #1a1a1a;
+            --ui-bg: #111; --axis-x: #400; --axis-y: #004; --shadow: #f04;
+        }
+        [data-theme="light"] {
+            --bg: #f0f0f0; --cell-bg: #fff; --text: #222; --border: #ccc;
+            --ui-bg: #ddd; --axis-x: #f99; --axis-y: #99f; --shadow: #444;
+        }
+        body, html { margin: 0; overflow: hidden; width: 100%; height: 100%; background: var(--bg); font-family: 'Courier New', monospace; color: var(--text); }
+        
+        #gridCanvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 1; }
+        #viewport { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; cursor: crosshair; }
+
+        /* PERFECT CENTERING */
+        .cell-container {
+            position: absolute; box-sizing: border-box; border: 0.5px solid var(--border);
+            background: var(--cell-bg); display: flex; align-items: center; justify-content: center;
+        }
+        .cell-input {
+            width: 100%; height: 100%; background: transparent; color: var(--text);
+            border: none; outline: none; resize: none; text-align: center;
+            font-family: inherit; font-size: 11px; padding: 10px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .cell-container:focus-within { border: 1px solid var(--text); z-index: 10; }
+        
+        .axis-x { border-top: 2px solid var(--axis-x) !important; }
+        .axis-y { border-left: 2px solid var(--axis-y) !important; }
+
+        .ant { 
+            position: absolute; width: 24px; height: 24px; background: #f04; 
+            border-radius: 4px; z-index: 1000; pointer-events: none; 
+            display: flex; align-items: center; justify-content: center; color: white;
+            box-shadow: 0 0 10px var(--shadow); transition: all 0.05s linear; font-weight: bold;
+        }
+
+        #ui { position: fixed; top: 0; width: 100%; background: var(--ui-bg); border-bottom: 1px solid var(--border); padding: 10px; display: flex; gap: 8px; align-items: center; z-index: 100; font-size: 11px; }
+        button { background: var(--cell-bg); color: var(--text); border: 1px solid var(--text); padding: 3px 8px; cursor: pointer; font-family: inherit; }
+        button:hover { background: var(--text); color: var(--cell-bg); }
+        input[type="range"] { width: 80px; }
+        #status { font-weight: bold; width: 75px; }
+    </style>
+</head>
+<body onclick="window.focus()">
+
+<canvas id="gridCanvas"></canvas>
+<div id="viewport" onmousedown="handleViewportClick(event)"></div>
+
+<div id="ui" onmousedown="event.stopPropagation()">
+    <div id="status">IDLE</div>
+    <button type="button" onclick="toggleColony()">START/RESET</button>
+    <button type="button" onclick="setTheme('dark')">DARK</button>
+    <button type="button" onclick="setTheme('light')">LIGHT</button>
+    <button type="button" onclick="follow = !follow">FOLLOW</button>
+    <span>TPS:</span>
+    <input type="range" min="1" max="60" value="10" oninput="tps = this.value" onmouseup="this.blur()">
+    <button type="button" onclick="exportJSON()">EXPORT</button>
+    <button type="button" onclick="document.getElementById('importFile').click()">IMPORT</button>
+    <input type="file" id="importFile" style="display:none" onchange="importJSON(this)">
+    <button type="button" onclick="nuke()" style="color:#f44">NUKE</button>
+    <span id="stats">Ants: 0 | X: 0, Y: 0</span>
+</div>
+
+<script>
+/** 1. DATABASE **/
+const dbName = "TrueLogicDB", store = "cells";
+const initDB = () => new Promise(res => {
+    const r = indexedDB.open(dbName, 1);
+    r.onupgradeneeded = e => e.target.result.createObjectStore(store);
+    r.onsuccess = e => res(e.target.result);
+});
+const db = async (t, k, v) => {
+    const d = await dbP;
+    return new Promise(res => {
+        const tr = d.transaction(store, t==='get'?"readonly":"readwrite");
+        const req = t==='get' ? tr.objectStore(store).get(k) : tr.objectStore(store).put(v, k);
+        req.onsuccess = () => res(req.result);
+    });
+};
+const dbP = initDB();
+
+/** 2. STATE **/
+let cam = { x: window.innerWidth/2, y: window.innerHeight/2, zoom: 1 };
+let ants = [], follow = false, run = false, tps = 10, lastTick = 0;
+const BASE = 160, view = document.getElementById('viewport'), canvas = document.getElementById('gridCanvas'), ctx = canvas.getContext('2d');
+
+function setTheme(t) { document.documentElement.setAttribute('data-theme', t); localStorage.setItem('ant-theme', t); render(); }
+setTheme(localStorage.getItem('ant-theme') || 'dark');
+
+/** 3. THE "INSTRUCTION-FIRST" ENGINE **/
+async function step() {
+    let activeAnts = [...ants];
+    for (let i = 0; i < activeAnts.length; i++) {
+        let a = activeAnts[i];
+        if (!ants.includes(a)) continue;
+        await processAnt(a, 0);
+    }
+    if (ants.length === 0 && run) toggleColony(false);
+    render();
+}
+
+async function processAnt(a, depth) {
+    if (depth > 20) return; // Prevent infinite recursion crashes
+
+    const code = (await db('get', `${a.x},${a.y}`) || "");
+    const match = code.match(/[><v^jomh+c]/i);
+
+    if (match) {
+        const key = match.toLowerCase(), tail = code.substring(match.index + 1);
+
+        if (key === 'h') { ants = ants.filter(x => x !== a); return; }
+        if (key === '>') { a.dir = '>'; await kineticMove(a, 1, 0); return; }
+        if (key === '<') { a.dir = '<'; await kineticMove(a, -1, 0); return; }
+        if (key === 'v') { a.dir = 'v'; await kineticMove(a, 0, 1); return; }
+        if (key === '^') { a.dir = '^'; await kineticMove(a, 0, -1); return; }
+
+        if (key === 'j') {
+            const ar = tail.match(/(-?\d+)\D+(-?\d+)(?:\D+([><v^jomh+c]))?/i);
+            if (ar) {
+                a.x = parseInt(ar[1]); a.y = parseInt(ar[2]);
+                if (ar[3]) applyDir(a, ar[3]);
+                return processAnt(a, depth + 1);
+            }
+        }
+        if (key === 'o') {
+            const ar = tail.match(/(-?\d+)\D+(-?\d+)\D+(.+)/);
+            if (ar) {
+                const old = await db('get', `${ar[1]},${ar[2]}`) || "";
+                await db('put', `${ar[1]},${ar[2]}`, ar[3]);
+                a.x = parseInt(ar[1]); a.y = parseInt(ar[2]);
+                applyDir(a, old);
+                return processAnt(a, depth + 1);
+            }
+        }
+        if (key === 'c') { // MITOSIS
+            const ar = tail.match(/(-?\d+)\D+(-?\d+)\D+(.+)/);
+            if (ar) {
+                const child = { x: a.x, y: a.y, dir: a.dir, id: Math.random() };
+                ants.push(child);
+                await db('put', `${a.x},${a.y}`, ar[3]);
+                a.x = parseInt(ar[1]); a.y = parseInt(ar[2]);
+                const dest = await db('get', `${a.x},${a.y}`) || "";
+                applyDir(a, dest); applyDir(child, ar[3]);
+                return processAnt(a, depth + 1);
+            }
+        }
+    } else {
+        // No instruction? Just move in current direction
+        let dx = (a.dir==='>')?1:(a.dir==='<')?-1:0;
+        let dy = (a.dir==='v')?1:(a.dir==='^')?-1:0;
+        await kineticMove(a, dx, dy);
+    }
+}
+
+function applyDir(a, s) { const m = s.match(/[><v^]/i); if (m) a.dir = m.toLowerCase(); }
+
+async function kineticMove(a, dx, dy) {
+    if (dx === 0 && dy === 0) return;
+    const nx = a.x + dx, ny = a.y + dy;
+    const victim = ants.find(o => o.x === nx && o.y === ny && o.id !== a.id);
+    const text = await db('get', `${nx},${ny}`);
+    if (victim || text) {
+        if (text) { await db('put', `${nx+dx},${ny+dy}`, text); await db('put', `${nx},${ny}`, ""); }
+        if (victim) { victim.x += dx; victim.y += dy; await kineticMove(victim, dx, dy); }
+    }
+    a.x = nx; a.y = ny;
+}
+
+/** 4. RENDERING & INPUT **/
+function handleViewportClick(e) {
+    if (e.target !== view) return;
+    const s = BASE * cam.zoom;
+    const wx = Math.floor((e.clientX - cam.x) / s);
+    const wy = Math.floor((e.clientY - cam.y) / s);
+    createDOMCell(wx, wy, s, "", true);
+}
+
+async function render() {
+    const s = BASE * cam.zoom;
+    const w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+    ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = cam.x % s; x < w; x += s) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
+    for (let y = cam.y % s; y < h; y += s) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
+    ctx.stroke();
+
+    view.innerHTML = '';
+    ants.forEach(a => {
+        const el = document.createElement('div'); el.className = 'ant';
+        el.innerText = a.dir.toUpperCase();
+        el.style.left = `${a.x*s+cam.x+(s/2)-12}px`; el.style.top = `${a.y*s+cam.y+(s/2)-12}px`;
+        view.appendChild(el);
+    });
+
+    if (cam.zoom > 0.15) {
+        const sX = Math.floor(-cam.x/s), sY = Math.floor(-cam.y/s);
+        for (let i = 0; i <= Math.ceil(w/s); i++) {
+            for (let j = 0; j <= Math.ceil(h/s); j++) {
+                const wx = sX + i, wy = sY + j;
+                const val = await db('get', `${wx},${wy}`);
+                if (val || wx === 0 || wy === 0) createDOMCell(wx, wy, s, val, false);
+            }
+        }
+    }
+    if (follow && ants[0]) {
+        cam.x = (w/2) - (ants[0].x * s); cam.y = (h/2) - (ants[0].y * s);
+    }
+}
+
+function createDOMCell(wx, wy, s, val, focus) {
+    const c = document.createElement('div');
+    c.className = 'cell-container' + (wx===0?' axis-y':'') + (wy===0?' axis-x':'');
+    c.style.width = c.style.height = `${s}px`;
+    c.style.left = `${wx*s+cam.x}px`; c.style.top = `${wy*s+cam.y}px`;
+    const i = document.createElement('textarea');
+    i.className = 'cell-input'; i.value = val || "";
+    i.oninput = e => db('put', `${wx},${wy}`, e.target.value);
+    c.appendChild(i); view.appendChild(c);
+    if (focus) i.focus();
+}
+
+/** 5. APP CONTROLS **/
+function loop(now) {
+    if (!run) return;
+    if (now - lastTick >= (1000 / tps)) { step(); lastTick = now; }
+    requestAnimationFrame(loop);
+}
+
+function toggleColony() {
+    run = !run; document.getElementById('status').innerText = run ? "RUNNING" : "HALTED";
+    if (run) { if (ants.length === 0) ants = [{ x: 0, y: 0, dir: 'v', id: Date.now() }]; requestAnimationFrame(loop); }
+}
+
+async function exportJSON() {
+    const d = await dbP, os = d.transaction(store, "readonly").objectStore(store);
+    const data = {};
+    os.openCursor().onsuccess = e => {
+        const c = e.target.result;
+        if(c){ data[c.key] = c.value; c.continue(); }
+        else {
+            const b = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(b);
+            a.download = `chaos.json`; a.click();
+        }
+    };
+}
+async function importJSON(i) {
+    const f = i.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = async e => {
+        const data = JSON.parse(e.target.result);
+        for(const [k,v] of Object.entries(data)) await db('put', k, v);
+        render();
+    };
+    r.readAsText(f);
+}
+function nuke() { if(confirm("NUKE DB?")) indexedDB.deleteDatabase(dbName), location.reload(); }
+
+let dr = false, last = {x:0,y:0};
+window.onmousedown = e => { if(e.target===view){ dr=true; last={x:e.clientX, y:e.clientY}; }};
+window.onmouseup = () => dr = false;
+window.onmousemove = e => { if(dr){ cam.x+=e.clientX-last.x; cam.y+=e.clientY-last.y; last={x:e.clientX, y:e.clientY}; render(); }};
+window.onwheel = e => {
+    const z = e.deltaY>0?0.9:1.1, nz = Math.min(Math.max(cam.zoom*z, 0.05), 3);
+    cam.x = e.clientX-(e.clientX-cam.x)*(nz/cam.zoom); cam.y = e.clientY-(e.clientY-cam.y)*(nz/cam.zoom);
+    cam.zoom=nz; render();
+};
+window.onresize = render;
+render();
+</script>
+</body>
+</html>
