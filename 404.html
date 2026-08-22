@@ -23,26 +23,16 @@
             const realHomeBtn = document.getElementById('real-home-btn');
 
             fixBtn.addEventListener('click', function() {
-                // Change button text to build "loading" suspense
                 fixBtn.innerText = "Fixing connection...";
                 
                 setTimeout(function() {
-                    // Hide error, show and play video
-                    errorMsg.style.display = 'none';
-                    video.style.display = 'block';
+                    window.location.href = https://www.yout-ube.com/watch?v=dQw4w9WgXcQ
                     
                     // Critical: Modern browsers require a user interaction to play audio
                     video.play().catch(error => {
                         console.log("Autoplay blocked, but we have the click!");
                     });
-                }, 1500); // 1.5 second delay for "realism"
-            });
-
-            // Show the escape button after 10 seconds of the song
-            video.addEventListener('timeupdate', function() {
-                if (video.currentTime >= 10) { 
-                    realHomeBtn.style.display = 'block';
-                }
+                }, 1500);
             });
         </script>
     </body>
